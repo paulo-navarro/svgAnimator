@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>SVG Animator</title>
+    <script type="text/javascript" src="./js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="./js/svgAnimator.js"></script>
+    <script type="text/javascript" src="./js/interface.js"></script>
+    <script src="./ace/src/ace.js"></script>
+    <script src="./ace/src/ext-language_tools.js"></script>
+    <link rel="stylesheet" href="./svgAnimatorInterface.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <main id="svgAnimator">
+      <h1>SVG ANIMATOR</h1>
+      <section id="interface">
+        <section id="mainScene"></section>
+        <section id="settings">
+          <h2>Settings</h2>
+          <label>Duration</label>
+          <input type="number" id="duration" min="0" value="1"/><br>
+          <label>Delay</label>
+          <input type="number" id="delay" min="0" value="0"/><br>
+          <label>Direction</label>
+          <select id="direction">
+            <option>normal</option>
+            <option>reverse</option>
+            <option>alternate</option>
+            <option>alternate-reverse</option>
+          </select><br>
+          <button id="playButton">play</button>
+        </section>
+        <section id="frames">
+            <label id="addFileLabel" for="addFile">+</label>
+            <input type="file" id="addFile" accept="image/svg" multiple/>
+        </section>
+      </section>
+      <section>
+
+      </section>
+    </main>
+  </body>
+</html>
