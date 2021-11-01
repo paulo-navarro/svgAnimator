@@ -28,19 +28,23 @@ class svgAnimator {
 
         let params = {};
         
-        if(this.valueChange(curves)) {
+        if(this.valueChange(curves)) { console.log('ping')
           params['curves'] = curves;
         }
 
-        if(this.valueChange(transforms)) {
+        if(this.valueChange(transforms)) {console.log('poing')
           params['transforms'] = transforms;
+        }
+
+        if(this.valueChange(transformOrigin)) {console.log('pung')
+          params['transforms-origin'] = transformOrigin;
         }
 
         for (let i = 0; i < this.animatableStyles.length; i++) {
           let param  = this.animatableStyles[i];
           let styles = this.getFramesStyle(childId, frames, param);
 
-          if(this.valueChange(styles)) {
+          if(this.valueChange(styles)) {console.log('')
             params[param] = styles;
           }
         }
@@ -55,7 +59,7 @@ class svgAnimator {
           }
         }
 
-        params = {...params, ...{'transform-origin': transformOrigin}};
+        params = {...params};
 
         let keyframes = this.getKeyframes(`${this.keyframePrefix}_${this.animationCounter}`, params);
 
@@ -182,44 +186,50 @@ class svgAnimator {
 
   getKeyframes(name, items) {
     let key = 0;
-    let totalFrames = items[Object.keys(items)[0]].length;
+    if (items.length === 0 || Object.keys(items)[0] === undefined) {
 
-    let percentagePerFrame = 100 / (totalFrames - 1);
-    let keyframes = `\n\n  @keyframes ${name} {\n`;
-    let haveAttributes = false;
+      return null;
+    } else {
 
-    for (let i = 0; i < totalFrames; i++) {
+      let totalFrames = items[Object.keys(items)[0]].length;
 
-      let styles = '';
-      for (let i2 = 0; i2 < this.animatableStyles.length; i2++) {
-        let animatableStyle = this.animatableStyles[i2];
-        styles += items[animatableStyle] && items[animatableStyle][i] && items[animatableStyle][i] !== 'none'? this.formatAsAttribute(`${animatableStyle}: ${items[animatableStyle][i]}`) : '';
+      let percentagePerFrame = 100 / (totalFrames - 1);
+      let keyframes = `\n\n  @keyframes ${name} {\n`;
+      let haveAttributes = false;
+
+      for (let i = 0; i < totalFrames; i++) {
+
+        let styles = '';
+        for (let i2 = 0; i2 < this.animatableStyles.length; i2++) {
+          let animatableStyle = this.animatableStyles[i2];
+          styles += items[animatableStyle] && items[animatableStyle][i] && items[animatableStyle][i] !== 'none'? this.formatAsAttribute(`${animatableStyle}: ${items[animatableStyle][i]}`) : '';
+        }
+        for (let i2 = 0; i2 < this.animatableAttrs.length; i2++) {
+          let animatableAttr = this.animatableAttrs[i2];
+          styles += items[animatableAttr] && items[animatableAttr][i] && items[animatableAttr][i] !== 'none'? this.formatAsAttribute(`${animatableAttr}: ${items[animatableAttr][i]}`) : '';
+        }
+
+        styles += items['transform-origin'] && items['transform-origin'][i] && items['transform-origin'][i] !== ''? this.formatAsAttribute(`transform-origin: ${items['transform-origin'][i]}`): ''; 
+        //styles += this.formatAsAttribute('transform-box: fill-box');
+        let d         = items.curves && items.curves[i]? this.formatAsAttribute(`d:path('${items.curves[i]}')`) : '';
+        let transform = items.transforms && items.transforms[i]? this.formatAsAttribute(`transform: ${items.transforms[i]}`) : '';
+
+        if(`${d}${styles}${transform}` !== '') {
+          haveAttributes = true;
+        }
+
+        keyframes += `    ${key.toFixed(4)}% {\n${d}${styles}${transform}    }\n`;
+        key += percentagePerFrame;
+
+        if (key > 100) {
+          key = 100;
+        }
       }
-      for (let i2 = 0; i2 < this.animatableAttrs.length; i2++) {
-        let animatableAttr = this.animatableAttrs[i2];
-        styles += items[animatableAttr] && items[animatableAttr][i] && items[animatableAttr][i] !== 'none'? this.formatAsAttribute(`${animatableAttr}: ${items[animatableAttr][i]}`) : '';
-      }
 
-      styles += items['transform-origin'] && items['transform-origin'][i] && items['transform-origin'][i] !== ''? this.formatAsAttribute(`transform-origin: ${items['transform-origin'][i]}`): ''; 
+      keyframes += `  }`.toLowerCase();
 
-      let d         = items.curves && items.curves[i]? this.formatAsAttribute(`d:path('${items.curves[i]}')`) : '';
-      let transform = items.transforms && items.transforms[i]? this.formatAsAttribute(`transform: ${items.transforms[i]}`) : '';
-
-      if(`${d}${styles}${transform}` !== '') {
-        haveAttributes = true;
-      }
-
-      keyframes += `    ${key.toFixed(4)}% {\n${d}${styles}${transform}    }\n`;
-      key += percentagePerFrame;
-
-      if (key > 100) {
-        key = 100;
-      }
+      return haveAttributes ? keyframes : null;
     }
-
-    keyframes += `  }`.toLowerCase();
-
-    return haveAttributes ? keyframes : null;
   }
 
   getStyle(target, childId, animation) {

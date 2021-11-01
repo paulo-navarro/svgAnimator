@@ -49,8 +49,8 @@ $("body").ready(() => {
 
     let svgAni = new svgAnimator();
     svgAni.animateSVG(targetImage, sprite, `${duration}s`, `${delay}s`, 'infinite', `${direction}`);
-    $("#css").html(escape($(targetImage).prop('outerHTML')) + "\n\n");
-    svgCode = `<style>\n${svgAni.getCSS()} \n</style>\n\n`;
+    let originalSvgDom = $(targetImage).prop('outerHTML') + "\n\n";
+    svgCode = `${originalSvgDom}\n\n<style>\n${svgAni.getCSS()} \n</style>\n\n`;
     editor.session.setValue(svgCode)
   });
   
@@ -62,15 +62,15 @@ $("body").ready(() => {
     editor.setOptions({
         theme: "ace/theme/tomorrow_night_eighties",
         mode: "ace/mode/markdown",
-        maxLines: 30,
+        maxLines: 500,
         minLines: 30,
         autoScrollEditorIntoView: true,
     });
     var refs = {};
     function updateToolbar() {
-        refs.saveButton.disabled = editor.session.getUndoManager().isClean();
+        /*refs.saveButton.disabled = editor.session.getUndoManager().isClean();
         refs.undoButton.disabled = !editor.session.getUndoManager().hasUndo();
-        refs.redoButton.disabled = !editor.session.getUndoManager().hasRedo();
+        refs.redoButton.disabled = !editor.session.getUndoManager().hasRedo();*/
     }
     editor.on("input", updateToolbar);
     function save() {

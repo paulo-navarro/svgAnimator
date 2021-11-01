@@ -109,6 +109,7 @@ svg {
   white-space: nowrap;
 }
 
+#frames div,
 #frames svg {
   width: auto;
   max-height: 100%;
