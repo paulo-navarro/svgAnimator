@@ -69,8 +69,8 @@ svg {
 }
 
 #mainScene svg {
-  width: auto;
-  max-height: 100%;
+  /* width: auto; */
+  /* max-height: 100%; */
 }
 
 #settings {

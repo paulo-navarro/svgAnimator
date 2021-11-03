@@ -22,22 +22,24 @@ class svgAnimator {
     children.each((key, child) => {
       if($(child).attr('id')){
         let childId         = `#${$(child).attr('id')}`;
+        this.changeAttributes(childId)
         let curves          = this.getFramesAttribute(childId, frames, 'd');
         let transforms      = this.getFramesTransforms(childId, frames);
         let transformOrigin = this.getFramesTransformOrigin(childId, frames);
 
         let params = {};
         
-        if(this.valueChange(curves)) { console.log('ping')
+        if(this.valueChange(curves)) {
           params['curves'] = curves;
         }
 
-        if(this.valueChange(transforms)) {console.log('poing')
+        if(this.valueChange(transforms)) {
           params['transforms'] = transforms;
         }
 
-        if(this.valueChange(transformOrigin)) {console.log('pung')
+        if(this.valueChange(transformOrigin)) {
           params['transforms-origin'] = transformOrigin;
+          $(childId).css('transform-box', 'fill-box');
         }
 
         for (let i = 0; i < this.animatableStyles.length; i++) {
@@ -90,6 +92,26 @@ class svgAnimator {
     return false;
   }
   
+  changeAttributes(id) {
+    let item = $(id);
+    let attrToRemove = []
+
+    item.each(function() {
+      $.each(this.attributes, function() {
+        if(this.specified) {
+          if(this.name.startsWith('inkscape')) {
+            console.log(this.name, this.value);
+            attrToRemove.push(this.name)
+          }
+        }
+      });
+    });
+
+    //$(attrToRemove).each((attr) => {
+    //  item.removeAttr(attr)
+    //})
+  }
+  
   getCSS() {
     return `${this.styles}${this.keyframes}`;
   }
@@ -115,6 +137,7 @@ class svgAnimator {
 
   getFramesTransformOrigin(id, frames) {
     let transformOrigins = [];
+    let item = $(id);
 
     for (let i = 0; i < frames.length; i++) {
       let frameItem = $(frames[i]).find(`${id}`);
@@ -128,10 +151,12 @@ class svgAnimator {
         
         if(rotateValue && rotateValue.length > 0) {
           let transformOriginValue = rotateValue[0].split(',');
+          let itemX= parseFloat(transformOriginValue[1]) - item.get(0).getBBox().x
+          let itemY= parseFloat(transformOriginValue[2]) - item.get(0).getBBox().y
           let coma = '';
-          for(let i=1; i < transformOriginValue.length; i++) {
-            transformOrigin += `${coma}${transformOriginValue[i]}px`;
-            coma = " ";
+          
+          if(transformOriginValue[1] && transformOriginValue[2] ) {
+            transformOrigin = `${itemX}px ${itemY}px`
           }
 
           transformOrigins.push(`${transformOrigin}`);
