@@ -22,7 +22,7 @@ class svgAnimator {
     children.each((key, child) => {
       if($(child).attr('id')){
         let childId         = `#${$(child).attr('id')}`;
-        this.changeAttributes(childId)
+        this.clearAttributes(childId)
         let curves          = this.getFramesAttribute(childId, frames, 'd');
         let transforms      = this.getFramesTransforms(childId, frames);
         let transformOrigin = this.getFramesTransformOrigin(childId, frames);
@@ -38,7 +38,7 @@ class svgAnimator {
         }
 
         if(this.valueChange(transformOrigin)) {
-          params['transforms-origin'] = transformOrigin;
+          params['transform-origin'] = transformOrigin;
           $(childId).css('transform-box', 'fill-box');
         }
 
@@ -46,7 +46,7 @@ class svgAnimator {
           let param  = this.animatableStyles[i];
           let styles = this.getFramesStyle(childId, frames, param);
 
-          if(this.valueChange(styles)) {console.log('')
+          if(this.valueChange(styles)) {
             params[param] = styles;
           }
         }
@@ -92,24 +92,23 @@ class svgAnimator {
     return false;
   }
   
-  changeAttributes(id) {
+  clearAttributes(id) {
     let item = $(id);
     let attrToRemove = []
 
     item.each(function() {
       $.each(this.attributes, function() {
         if(this.specified) {
-          if(this.name.startsWith('inkscape')) {
-            console.log(this.name, this.value);
+          if(this.name.startsWith('inkscape') || this.name.startsWith('sodipodi')) {
             attrToRemove.push(this.name)
           }
         }
       });
     });
 
-    //$(attrToRemove).each((attr) => {
-    //  item.removeAttr(attr)
-    //})
+    for (let i = 0; i < attrToRemove.length; ++i) {
+      item.removeAttr(attrToRemove[i])
+    }
   }
   
   getCSS() {
@@ -151,9 +150,8 @@ class svgAnimator {
         
         if(rotateValue && rotateValue.length > 0) {
           let transformOriginValue = rotateValue[0].split(',');
-          let itemX= parseFloat(transformOriginValue[1]) - item.get(0).getBBox().x
-          let itemY= parseFloat(transformOriginValue[2]) - item.get(0).getBBox().y
-          let coma = '';
+          let itemX= parseFloat(transformOriginValue[1]) - parseFloat(item.get(0).getBBox().x)
+          let itemY= parseFloat(transformOriginValue[2]) - parseFloat(item.get(0).getBBox().y)
           
           if(transformOriginValue[1] && transformOriginValue[2] ) {
             transformOrigin = `${itemX}px ${itemY}px`
@@ -233,9 +231,9 @@ class svgAnimator {
           let animatableAttr = this.animatableAttrs[i2];
           styles += items[animatableAttr] && items[animatableAttr][i] && items[animatableAttr][i] !== 'none'? this.formatAsAttribute(`${animatableAttr}: ${items[animatableAttr][i]}`) : '';
         }
-
+        
         styles += items['transform-origin'] && items['transform-origin'][i] && items['transform-origin'][i] !== ''? this.formatAsAttribute(`transform-origin: ${items['transform-origin'][i]}`): ''; 
-        //styles += this.formatAsAttribute('transform-box: fill-box');
+
         let d         = items.curves && items.curves[i]? this.formatAsAttribute(`d:path('${items.curves[i]}')`) : '';
         let transform = items.transforms && items.transforms[i]? this.formatAsAttribute(`transform: ${items.transforms[i]}`) : '';
 
